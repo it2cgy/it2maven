@@ -3,6 +3,8 @@ package com.itself.page;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -17,9 +19,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/loginPage")
 public class LoginPageController {
 	
+	static final Logger logger = LoggerFactory.getLogger(LoginPageController.class);
 	
 	@RequestMapping(value="/login")
 	public String login(HttpServletRequest request,HttpServletResponse response){
+		logger.info("跳转到登陆页面");
 		return "/login/login";
 	}
 
