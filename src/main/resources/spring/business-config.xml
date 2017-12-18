@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Repository and Service layers
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa" xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd
+		 http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd"
+		xmlns:task="http://www.springframework.org/schema/task" 
+		xmlns:hdp="http://www.springframework.org/schema/hadoop"  
+		>
+
+    <!-- ========================= RESOURCE DEFINITIONS ========================= -->
+     
+    <!-- 将多个配置文件读取到容器中，交给Spring管理 -->
+    <bean id="propertyConfigurer"
+        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <!-- 这里支持多种寻址方式：classpath和file -->
+                <value>classpath:spring/data-access.properties</value>
+<!--                 <value>classpath:spring/jedis.properties</value> -->
+                <!-- 推荐使用file的方式引入，这样可以将配置和代码分离 -->
+                <!-- <value>file:/opt/demo/config/demo.properties</value> -->
+            </list>
+        </property>
+     </bean>
+    
+<!--       <hdp:configuration resources="classpath:spring/hbase-site.xml" />   -->
+<!-- 	<hdp:hbase-configuration configuration-ref="hadoopConfiguration" /> -->
+    <!-- 配置HbaseTemplate -->  
+<!--     <bean id="htemplate" class="org.springframework.data.hadoop.hbase.HbaseTemplate">   -->
+<!--         <property name="configuration" ref="hbaseConfiguration">   -->
+<!--         </property>   -->
+<!--     <property name="encoding" value="UTF-8"></property>   -->
+<!--     </bean>   -->
+    
+    <!-- 获取spring上下文 的util类 -->
+	<bean id="springContextUtil" class="com.itself.util.SpringContextUtil"/>
+<!--     <import resource="redis-context.xml"/> -->
+    <import resource="data-mybatis-config.xml"/>
+    
+    
+    
+<!--     <context:component-scan base-package="com.yunengzhe.demo"> -->
+<!--         <context:include-filter type="regex" expression="com.yunengzhe.demo.*.*Repository*"/> -->
+<!--         <context:include-filter type="regex" expression="com.yunengzhe.demo"/> -->
+<!--     </context:component-scan> -->
+
+    <!-- Configurer that replaces ${...} placeholders with values from a properties file -->
+    <!-- (in this case, JDBC-related settings for the JPA EntityManager definition below) -->
+    <context:property-placeholder location="classpath:spring/data-access.properties" system-properties-mode="OVERRIDE"/>
+<!--                                   system-properties-mode="OVERRIDE"/> -->
+<!--      <context:property-placeholder location="classpath:spring/test-jedis.properties" -->
+<!--                                   system-properties-mode="OVERRIDE"/> -->
+<!--     enables scanning for @Transactional annotations -->
+    <!-- 使用annotation定义事务 -->
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" />
+    
+
+
+    <!-- ==================		 3 Profiles to choose from 			===================
+                                    - jdbc (uses Spring" JdbcTemplate)
+                                    - jpa
+                                    - spring-data-jpa
+          =============================================================================-->
+
+    <!-- JPA EntityManagerFactory -->
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
+          p:dataSource-ref="dataSource">
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"
+                  p:database="${jpa.database}"/>
+            <!-- the 'database' parameter refers to the database dialect being used.
+                By default, Hibernate will use a 'HSQL' dialect because 'jpa.database' has been set to 'HSQL'
+                inside file spring/data-access.properties
+
+             -->
+             
+        </property>
+        <!-- gDickens: BOTH Persistence Unit and Packages to Scan are NOT compatible, persistenceUnit will win -->
+        <!--<property name="persistenceUnitName" value="petclinic"/>-->
+        <property name="packagesToScan" value="com.yunengzhe.demo"/>
+        <property name="jpaProperties">
+            <props>
+                <!-- 配置hibernate的属性 -->
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.format_sql">false</prop>
+            </props>
+        </property>
+    </bean>
+    
+
+    <!-- Transaction manager for a single JPA EntityManagerFactory (alternative to JTA) -->
+    <bean id="jpaTransactionManager" class="org.springframework.orm.jpa.JpaTransactionManager"
+          p:entityManagerFactory-ref="entityManagerFactory"/>
+
+
+    <!--
+        Post-processor to perform exception translation on @Repository classes (from native
+        exceptions such as JPA PersistenceExceptions to Spring's DataAccessException hierarchy).
+    -->
+    <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
+
+
+    <!-- Transaction manager for a single JDBC DataSource (alternative to JTA) -->
+    <bean id="jdbcTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+          p:dataSource-ref="dataSource"/>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
+    <bean id="namedParameterJdbcTemplate"
+          class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
+    <context:component-scan base-package="com.yunengzhe.demo"/>
+    <!--
+        Loads JPA beans
+        Will automatically be transactional due to @Transactional.
+        EntityManager will be auto-injected due to @PersistenceContext.
+        PersistenceExceptions will be auto-translated due to @Repository.
+    -->
+ 
+    <jpa:repositories base-package="com.yunengzhe.demo"
+        transaction-manager-ref="transactionManager"
+        entity-manager-factory-ref="entityManagerFactory" />
+    <!-- Jpa 事务配置 -->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory" />
+    </bean>
+    <!-- 指定JPA属性；如Hibernate中指定是否显示SQL的“hibernate.show_sql”属性 -->
+<!--     <bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" /> -->
+    
+     <!-- 异步线程池 --> 
+	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor"> 
+	    <!-- 核心线程数  -->  
+	    <property name="corePoolSize" value="5" />  
+	    <!-- 最大线程数 -->  
+	    <property name="maxPoolSize" value="10" />  
+	    <!-- 队列最大长度 >=mainExecutor.maxSize -->  
+	    <property name="queueCapacity" value="100" />  
+	    <!-- 线程池维护线程所允许的空闲时间 -->  
+	    <property name="keepAliveSeconds" value="300" />  
+	    <!-- 线程池对拒绝任务(无线程可用)的处理
+	    策略 --> <!-- 若不作该处理，当线程满了，队列满了之后，继续往下增加任务，则抛出异常，拒绝该任务 --> 
+	    <property name="rejectedExecutionHandler">  
+	      <bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy" />  
+	    </property>
+	</bean>
+	   
+</beans>
