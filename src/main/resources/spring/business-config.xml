@@ -15,6 +15,8 @@
 		xmlns:hdp="http://www.springframework.org/schema/hadoop"  
 		>
 
+    <context:component-scan base-package="com.itself.service"/>
+    <context:component-scan base-package="com.itself.dao"/>
     <!-- ========================= RESOURCE DEFINITIONS ========================= -->
      
     <!-- 将多个配置文件读取到容器中，交给Spring管理 -->
@@ -47,10 +49,9 @@
     
     
     
-<!--     <context:component-scan base-package="com.yunengzhe.demo"> -->
-<!--         <context:include-filter type="regex" expression="com.yunengzhe.demo.*.*Repository*"/> -->
-<!--         <context:include-filter type="regex" expression="com.yunengzhe.demo"/> -->
-<!--     </context:component-scan> -->
+    <context:component-scan base-package="com.itselft">
+        <context:include-filter type="regex" expression="com.itself"/>
+    </context:component-scan>
 
     <!-- Configurer that replaces ${...} placeholders with values from a properties file -->
     <!-- (in this case, JDBC-related settings for the JPA EntityManager definition below) -->
@@ -85,7 +86,7 @@
         </property>
         <!-- gDickens: BOTH Persistence Unit and Packages to Scan are NOT compatible, persistenceUnit will win -->
         <!--<property name="persistenceUnitName" value="petclinic"/>-->
-        <property name="packagesToScan" value="com.yunengzhe.demo"/>
+<!--         <property name="packagesToScan" value="com.yunengzhe.demo"/> -->
         <property name="jpaProperties">
             <props>
                 <!-- 配置hibernate的属性 -->
@@ -121,7 +122,6 @@
         <constructor-arg ref="dataSource"/>
     </bean>
 
-    <context:component-scan base-package="com.yunengzhe.demo"/>
     <!--
         Loads JPA beans
         Will automatically be transactional due to @Transactional.
@@ -129,7 +129,7 @@
         PersistenceExceptions will be auto-translated due to @Repository.
     -->
  
-    <jpa:repositories base-package="com.yunengzhe.demo"
+    <jpa:repositories base-package="com.itself"
         transaction-manager-ref="transactionManager"
         entity-manager-factory-ref="entityManagerFactory" />
     <!-- Jpa 事务配置 -->
