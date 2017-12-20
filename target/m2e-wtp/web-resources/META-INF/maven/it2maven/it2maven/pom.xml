@@ -241,6 +241,12 @@
 	    <artifactId>spymemcached</artifactId>
 	    <version>2.8.4</version>
 	</dependency>
+<!-- https://mvnrepository.com/artifact/org.mongodb/mongo-java-driver -->
+<dependency>
+    <groupId>org.mongodb</groupId>
+    <artifactId>mongo-java-driver</artifactId>
+    <version>3.4.2</version>
+</dependency>
 
 
 
