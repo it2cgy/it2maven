@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    - DispatcherServlet application context for PetClinic's web tier.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns="http://www.springframework.org/schema/beans"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd 
+        http://www.springframework.org/schema/aop   http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+
+    <mvc:view-resolvers>
+        <mvc:bean-name/>
+        <mvc:jsp prefix="/jsp" suffix=".jsp"/>
+    </mvc:view-resolvers>
+    <aop:aspectj-autoproxy />
+<!--     <context:component-scan base-package="com.itself">  -->
+<!--         <context:include-filter type="regex" expression=".*controller\.[^.]*"/> -->
+<!--     </context:component-scan> -->
+      <!-- 扫描包 -->
+    <context:component-scan base-package="com.itself.controller">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+   <!-- 添加注解驱动 -->
+    <mvc:annotation-driven>
+        <mvc:argument-resolvers>
+        	<!--项目中的demo有关，暂时注释掉  --> 
+            <!-- 自定义标签获得token --> 
+        </mvc:argument-resolvers>
+        <mvc:message-converters register-defaults="false">
+            <bean
+                    class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter4">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <!-- 避免IE返回时出现下载提示！ -->
+                        <value>text/html;charset=UTF-8</value>
+                        <value>application/json;charset=UTF-8</value>
+                        <!--<value>application/xml;charset=UTF-8</value>-->
+                    </list>
+                </property>
+            </bean>  
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+    <mvc:resources mapping="/resources/**" location="/resources/"/>
+    <mvc:resources mapping="/images/*" location="/images/"/>
+    <mvc:resources mapping="/js/**/*" location="/js/"/>
+    <mvc:resources mapping="/css/*" location="/css/"/>
+    <mvc:view-controller path="/" view-name="loginPage"/>
+    <mvc:default-servlet-handler/>
+     <!-- 添加注解驱动 -->
+    <mvc:annotation-driven>
+    </mvc:annotation-driven>
+    
+    
+<!--      <mvc:cors> -->
+<!--          <mvc:mapping path="/**" -->
+<!--         allowed-origins="*" -->
+<!--         allowed-headers="*"  -->
+<!--         allowed-methods="POST, GET, OPTIONS, PUT, DELETE"    -->
+<!--         max-age="36000" /> -->
+<!--     </mvc:cors> -->
+</beans>

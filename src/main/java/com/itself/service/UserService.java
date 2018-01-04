@@ -18,12 +18,12 @@ public class UserService {
 
 	private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 	
-	@Autowired
-	private UserDao userDaoImpl;
-	
-	public List<UserPO> getUserList(){
-		List<UserPO> result = userDaoImpl.findAll();
-		return result;
-	}
+//	@Autowired
+//	private UserDao userDaoImpl;
+//	
+//	public List<UserPO> getUserList(){
+//		List<UserPO> result = userDaoImpl.findAll();
+//		return result;
+//	}
 	 
 }
