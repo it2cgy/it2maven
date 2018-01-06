@@ -11,7 +11,7 @@ public class ScaffoldGenerator {
 		// arg2 业务对象名,即Model,双词以上要求单词首字大写
 		// arg3 表名
 
-		ScaffoldGen generator1 = new ScaffoldGen("itself", "User", "it_user");
+		ScaffoldGen generator1 = new ScaffoldGen("itself", "User", "cg_user");
 		generator1.execute(false);
 }
 }

@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.itself.domain.po.UserPO;
 import com.itself.service.UserService;
+
 
 /**
 * @ClassName: LoginPageController 
@@ -32,10 +32,9 @@ public class LoginPageController {
 	private UserService userService;
 	
 	@RequestMapping(value="/login")
-	@ResponseBody
 	public String login(Model model,HttpServletRequest request,HttpServletResponse response){
 		logger.info("跳转到登陆页面");
-		List<UserPO> users = userService.getUserList();
+		List<UserPO> users = userService.getUser();
 		model.addAttribute("users",users);
 		return "/login/login";
 	}

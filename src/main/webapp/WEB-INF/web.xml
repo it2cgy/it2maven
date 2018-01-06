@@ -14,15 +14,15 @@
 </context-param> 
   
 
-<!--     <listener> -->
-<!-- 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class> -->
-<!--     </listener> -->
+    <listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
     
 	 
-<!--    <context-param> -->
-<!-- 		<param-name>contextConfigLocation</param-name> -->
-<!-- 		<param-value>classpath:spring/business-config.xml</param-value> -->
-<!--   	</context-param> -->
+   <context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:spring/spring-*.xml</param-value>
+  	</context-param>
   	<!-- springMVC配置文件 -->
     <servlet>
 		<servlet-name>dispatcher</servlet-name>

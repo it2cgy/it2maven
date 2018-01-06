@@ -4,7 +4,7 @@
 <body>
 <h2>this is the login page!!!</h2>
 <c:forEach items="${users}" var="user"> 
-	user.username
+	${user.name}
 </c:forEach>
 </body>
 </html>

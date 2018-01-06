@@ -27,7 +27,7 @@ public class ScaffoldGen {
 	private static final String JDBC_URL = "jdbc.url";
 	private static final String JDBC_DRIVER = "jdbc.driverClassName";
 	private static final String JDBC_SCHEMA = "schema";
-	private static final String CONFIG_PROPERTIES = "src\\main\\resources\\spring\\data-access.properties"; 
+	private static final String CONFIG_PROPERTIES = "src\\main\\resources\\spring\\jdbc.properties"; 
 	private final Log log = LogFactory.getLog(getClass());
 	private Connection conn;
 	private String schema;
