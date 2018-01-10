@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.itself.domain.po.UserPO">
+
+	<resultMap id="result" type="com.itself.domain.po.UserPO">
+            <id property="id" column="id" jdbcType="INTEGER" />
+            <result property="name" column="name" jdbcType="VARCHAR" />
+            <result property="password" column="password" jdbcType="VARCHAR" />
+            <result property="sax" column="sax" jdbcType="NUMERIC" />
+            <result property="createTime" column="create_time" />
+            <result property="updateTime" column="update_time" />
+
+	</resultMap>
+
+	<sql id="base_field">
+		id,name,password,sax,create_time,update_time
+	</sql>
+	
+	<sql id="other-condition">
+            <if test= "name != null ">	and name = #{name,jdbcType=VARCHAR }</if>
+            <if test= "password != null ">	and password = #{password,jdbcType=VARCHAR }</if>
+            <if test= "sax != null ">	and sax = #{sax,jdbcType=NUMERIC }</if>
+            <if test= "createTime != null ">	and create_time = #{createTime }</if>
+            <if test= "updateTime != null ">	and update_time = #{updateTime }</if>
+
+ 	</sql>
+ 	
+ 	<sql id="like-condition">
+            <if test= "name != null ">	and name like "%"#{name}"%"</if>
+            <if test= "password != null ">	and password like "%"#{password}"%"</if>
+            <if test= "sax != null ">	and sax = #{sax,jdbcType=NUMERIC }</if>
+            <if test= "createTime != null ">	and create_time = #{createTime }</if>
+            <if test= "updateTime != null ">	and update_time = #{updateTime }</if>
+
+ 	</sql>
+	
+	 	<sql id="one-equal-condition">
+            <if test= "name != null ">	or name = #{name,jdbcType=VARCHAR }</if>
+            <if test= "password != null ">	or password = #{password,jdbcType=VARCHAR }</if>
+            <if test= "sax != null ">	or sax = #{sax,jdbcType=NUMERIC }</if>
+            <if test= "createTime != null ">	or create_time = #{createTime }</if>
+            <if test= "updateTime != null ">	or update_time = #{updateTime }</if>
+
+ 	</sql>
+ 	 
+	<sql id="selectByMapSQL">
+		select
+		<include refid="base_field" />
+		from cg_user
+		<choose>
+		    <when test="findBy != null">
+		      	<where>
+					<include refid="other-condition" />
+				</where>
+		    </when>
+		    <when test="findByLike != null">
+		      	<where>
+					<include refid="like-condition" />
+				</where>
+		    </when>
+		    
+		     <when test="oneEqual != null">
+		      	<where>
+					<include refid="one-equal-condition" />
+				</where>
+		    </when>
+		</choose>
+		<if test="sortName != null">
+			order by ${sortName} ${sortBy}
+		</if>
+	</sql>
+	
+	<select id="selectByMap" resultMap="result" >
+		<include refid="selectByMapSQL" />
+	</select>
+	
+	<select id="selectCount" resultType="int" >
+		select count(*) from (
+			<include refid="selectByMapSQL" />
+		) AABBCC_
+	</select>
+	
+	<select id="selectPage" resultMap="result" >
+		<include refid="selectByMapSQL" />
+		 limit #{startRow},#{pageSize}
+	</select>
+	
+	<select id="select" resultMap="result" parameterType="java.lang.Integer">
+		select
+		<include refid="base_field" />
+		from cg_user  
+		<where>
+			<if test="_parameter != null">
+				id = #{id,jdbcType=INTEGER}
+			</if>
+		</where>
+	</select>
+	
+	<select id="selectByIds" resultMap="result" >
+		select
+		<include refid="base_field" />
+		from cg_user  where id in (${_parameter})
+	</select>		
+
+	<insert id="insert" parameterType="com.itself.domain.po.UserPO" useGeneratedKeys="true" keyProperty="id">
+		insert into cg_user( id,name,password,sax,create_time,update_time ) values (#{id,jdbcType=INTEGER},#{name,jdbcType=VARCHAR},#{password,jdbcType=VARCHAR},#{sax,jdbcType=NUMERIC},#{createTime},#{updateTime} )
+	</insert>
+
+	<insert id="insertBatch" parameterType="java.util.List" >
+		<selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		
+		insert into cg_user( id,name,password,sax,create_time,update_time ) values
+		<foreach collection="list" item="item" index="index" separator=",">
+		(#{item.id,jdbcType=INTEGER},#{item.name,jdbcType=VARCHAR},#{item.password,jdbcType=VARCHAR},#{item.sax,jdbcType=NUMERIC},#{item.createTime},#{item.updateTime} )
+		</foreach>
+	</insert>
+	
+	<update id="update" parameterType="com.itself.domain.po.UserPO">
+		update cg_user set name=#{name,jdbcType=VARCHAR},password=#{password,jdbcType=VARCHAR},sax=#{sax,jdbcType=NUMERIC},create_time=#{createTime},update_time=#{updateTime} where id=#{id,jdbcType=INTEGER}
+	</update>	
+	
+	<update id="update4Selective" parameterType="com.itself.domain.po.UserPO">
+		update cg_user
+        <set>
+            <if test="name != null "> 
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null "> 
+                password = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="sax != null "> 
+                sax = #{sax,jdbcType=NUMERIC},
+            </if>
+            <if test="createTime != null "> 
+                create_time = #{createTime},
+            </if>
+            <if test="updateTime != null "> 
+                update_time = #{updateTime},
+            </if>
+        </set>
+         where id=#{id,jdbcType=INTEGER}
+	</update>	
+
+	<delete id="deleteByPrimaryKey">
+		delete from cg_user where id = #{id,jdbcType=INTEGER}
+	</delete>	
+
+	<delete id="delete" parameterType="com.itself.domain.po.UserPO">
+		delete from cg_user
+		<where>
+			<if test="id != null">
+				id = #{id,jdbcType=INTEGER}
+			</if>
+			<include refid="other-condition" />
+		</where>
+	</delete>	
+		
+</mapper>
+
